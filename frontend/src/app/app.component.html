@@ -1,0 +1,224 @@
+<a class="skip-link" href="#main-content">Ir al contenido</a>
+<div class="shell" [class.sidebar-open]="sidebarOpen()">
+  @if (sidebarOpen()) {
+    <button
+      class="sidebar-overlay"
+      aria-label="Cerrar navegación"
+      (click)="closeSidebar()"
+    ></button>
+  }
+  <aside class="sidebar" id="project-navigation" aria-label="Navegación del proyecto">
+    <div class="brand-row">
+      <a
+        href="#"
+        class="brand"
+        (click)="$event.preventDefault(); navigate('overview')"
+        aria-label="Docker Lab, inicio"
+      >
+        <span class="brand-symbol"><app-icon name="box" [size]="27" /></span>
+        <span class="brand-copy">
+          <span class="brand-wordmark">
+            docker
+            <span>lab</span>
+          </span>
+          <small>EXAMEN FINAL · DEVELOPERS</small>
+        </span>
+      </a>
+      <button class="icon-button sidebar-close" aria-label="Cerrar menú" (click)="closeSidebar()">
+        <app-icon name="close" />
+      </button>
+    </div>
+
+    <p class="nav-label">PROYECTO</p>
+    <nav class="primary-nav" aria-label="Secciones del proyecto">
+      <button
+        [class.active]="view() === 'overview'"
+        [attr.aria-current]="view() === 'overview' ? 'page' : null"
+        (click)="navigate('overview')"
+      >
+        <app-icon name="grid" [size]="19" />
+        <span>Vista general</span>
+      </button>
+      <button
+        [class.active]="view() === 'architecture'"
+        [attr.aria-current]="view() === 'architecture' ? 'page' : null"
+        (click)="navigate('architecture')"
+      >
+        <app-icon name="layers" [size]="19" />
+        <span>Arquitectura</span>
+        <span class="nav-count">5</span>
+      </button>
+      <button
+        [class.active]="view() === 'resources'"
+        [attr.aria-current]="view() === 'resources' ? 'page' : null"
+        (click)="navigate('resources')"
+      >
+        <app-icon name="folder" [size]="19" />
+        <span>Recursos y entrega</span>
+      </button>
+    </nav>
+
+    <p class="nav-label cases-label">
+      COMPONENTES DEL EXAMEN
+      <span>{{ store.totalCases() || 10 }}</span>
+    </p>
+    <nav class="case-nav" aria-label="Los diez casos del examen">
+      @for (r of store.data()?.requirements; track r.id) {
+        <button
+          [class.active]="view() === 'case' && selectedId() === r.id"
+          [attr.aria-current]="view() === 'case' && selectedId() === r.id ? 'page' : null"
+          [title]="r.title"
+          (click)="open(r.id)"
+        >
+          <span class="case-number">{{ r.id.toString().padStart(2, '0') }}</span>
+          <span class="case-name">{{ r.title }}</span>
+          <span
+            class="nav-dot"
+            [class.done]="r.progress.status === 'listo'"
+            [class.started]="r.progress.status === 'en-progreso'"
+          ></span>
+        </button>
+      }
+    </nav>
+
+    <div class="sidebar-progress">
+      <div>
+        <span>Avance del proyecto</span>
+        <strong>{{ store.completion() }}%</strong>
+      </div>
+      <div class="progress-track"><div [style.width.%]="store.completion()"></div></div>
+      <small>{{ store.ready() }} de {{ store.totalCases() || 10 }} casos listos para revisar</small>
+    </div>
+    <div class="sidebar-footer">
+      <span class="course-icon"><app-icon name="book" [size]="19" /></span>
+      <div>
+        <strong>Galaxy Training</strong>
+        <small>Docker & Docker Compose</small>
+      </div>
+      <span class="course-code">662</span>
+    </div>
+  </aside>
+
+  <main id="main-content" tabindex="-1">
+    <header class="topbar">
+      <div class="topbar-location">
+        <button
+          class="icon-button menu-toggle"
+          aria-label="Abrir navegación"
+          aria-controls="project-navigation"
+          [attr.aria-expanded]="sidebarOpen()"
+          (click)="sidebarOpen.set(!sidebarOpen())"
+        >
+          <app-icon name="menu" />
+        </button>
+        <span class="breadcrumb">Proyecto final</span>
+        <app-icon class="breadcrumb-separator" name="chevronRight" [size]="14" />
+        <span class="current-location">
+          {{
+            view() === 'case'
+              ? 'Caso ' + selectedId().toString().padStart(2, '0')
+              : view() === 'architecture'
+                ? 'Arquitectura'
+                : view() === 'resources'
+                  ? 'Recursos y entrega'
+                  : 'Vista general'
+          }}
+        </span>
+      </div>
+      <div class="topbar-right">
+        <span class="lab-tag" [class.is-offline]="!store.services()?.api">
+          <i></i>
+          {{
+            store.loading()
+              ? 'Conectando…'
+              : store.services()?.api
+                ? 'Entorno local activo'
+                : 'Sin conexión'
+          }}
+        </span>
+        <a class="api-link" href="/api/swagger/index.html" target="_blank" rel="noopener">
+          <app-icon name="code" [size]="17" />
+          API Docs
+          <app-icon name="arrowUpRight" [size]="13" />
+        </a>
+        <div class="topbar-divider"></div>
+        <button
+          class="profile-button"
+          (click)="profileOpen.set(true)"
+          aria-label="Editar datos del alumno"
+        >
+          <span class="profile-name">{{ store.studentDisplayName() }}</span>
+          <span class="avatar">{{ store.studentInitials() }}</span>
+        </button>
+      </div>
+    </header>
+    <div class="content">
+      @if (store.loading()) {
+        <div class="loading" role="status">
+          <span class="spinner"></span>
+          Conectando con el laboratorio…
+        </div>
+      }
+      @if (store.error()) {
+        <div class="error" role="alert">
+          <app-icon name="info" />
+          <div>
+            <strong>No pudimos cargar el proyecto</strong>
+            <p>{{ store.error() }}</p>
+          </div>
+          <button class="outline" (click)="store.load()">Reintentar</button>
+        </div>
+      }
+      @if (store.data(); as data) {
+        @switch (view()) {
+          @case ('overview') {
+            <app-overview
+              (selectRequirement)="open($event)"
+              (editProfile)="profileOpen.set(true)"
+            />
+          }
+          @case ('case') {
+            <app-requirement
+              [requirementId]="selectedId()"
+              (selectRequirement)="open($event)"
+              (back)="navigate('overview')"
+            />
+          }
+          @case ('architecture') {
+            <app-architecture (selectRequirement)="open($event)" />
+          }
+          @case ('resources') {
+            <app-resources (editProfile)="profileOpen.set(true)" />
+          }
+        }
+        <footer class="page-footer">
+          <span>
+            Docker Lab
+            <span class="footer-dot">·</span>
+            Proyecto de sustentación
+          </span>
+          <span>
+            Angular
+            <span>+</span>
+            .NET
+            <span>+</span>
+            SQL Server
+          </span>
+          <span class="footer-course">CURS-000662</span>
+        </footer>
+      }
+    </div>
+  </main>
+</div>
+@if (notifications.message()) {
+  <div class="toast" role="status">
+    <span class="toast-icon"><app-icon name="info" [size]="18" /></span>
+    <span>{{ notifications.message() }}</span>
+    <button class="icon-button" (click)="notifications.clear()" aria-label="Cerrar aviso">
+      <app-icon name="close" [size]="17" />
+    </button>
+  </div>
+}
+@if (profileOpen()) {
+  <app-profile-dialog (closed)="profileOpen.set(false)" />
+}

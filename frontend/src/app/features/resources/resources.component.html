@@ -1,0 +1,83 @@
+@if (store.data(); as data) {
+  <section class="page-heading">
+    <div>
+      <p class="eyebrow">DOCUMENTACIÓN Y ENTREGA</p>
+      <h1>Recursos para la sustentación</h1>
+      <p class="intro">Archivos de apoyo, entregables y el recorrido de la presentación.</p>
+    </div>
+    <a class="outline" href="/api/swagger/index.html" target="_blank" rel="noopener">
+      <app-icon name="code" [size]="17" />
+      Abrir Swagger
+      <app-icon name="arrowUpRight" [size]="15" />
+    </a>
+  </section>
+  <app-final-report />
+  <div class="resource-grid">
+    <a class="resource-card" href="/api/resources/rubric" target="_blank" rel="noopener">
+      <span class="resource-icon">
+        <app-icon name="file" [size]="19" />
+        <span class="resource-type">PDF</span>
+      </span>
+      <app-icon class="resource-arrow" name="arrowUpRight" [size]="18" />
+      <h3>Rúbrica original</h3>
+      <p>Las tres páginas del examen y sus diez componentes.</p>
+    </a>
+    <a class="resource-card" href="/api/resources/cheatsheet">
+      <span class="resource-icon">
+        <app-icon name="terminal" [size]="19" />
+        <span class="resource-type">MD</span>
+      </span>
+      <app-icon class="resource-arrow" name="arrowUpRight" [size]="18" />
+      <h3>Cheat Sheet personalizado</h3>
+      <p>Los comandos que usaremos en este proyecto.</p>
+    </a>
+    <a class="resource-card" href="/api/resources/guide">
+      <span class="resource-icon">
+        <app-icon name="book" [size]="19" />
+        <span class="resource-type">MD</span>
+      </span>
+      <app-icon class="resource-arrow" name="arrowUpRight" [size]="18" />
+      <h3>Guía de sustentación</h3>
+      <p>Guion de 10 minutos: qué explicar y mostrar en cada caso, con manual técnico de apoyo.</p>
+    </a>
+  </div>
+  <section class="panel">
+    <h2>Repositorio del proyecto</h2>
+    @if (data.profile.repositoryUrl) {
+      <p>
+        <a [href]="data.profile.repositoryUrl" target="_blank" rel="noopener">
+          {{ data.profile.repositoryUrl }} ↗
+        </a>
+      </p>
+    } @else {
+      <p class="muted">
+        Pendiente de crear el repositorio remoto en GitHub, GitLab u otra plataforma.
+      </p>
+    }
+    <button class="outline" (click)="editProfile.emit()">Editar datos y enlace</button>
+  </section>
+  <div class="two-columns">
+    <section class="panel">
+      <h2>Antes de presentar</h2>
+      <ol class="delivery-list">
+        <li>Subir código, comandos y configuraciones al repositorio.</li>
+        <li>Ejecutar manualmente los diez casos y adjuntar capturas reales.</li>
+        <li>Publicar las imágenes en Docker Hub y una nube.</li>
+        <li>Verificar persistencia al recrear los contenedores.</li>
+        <li>Ensayar el guion de 10 minutos con el portal y las evidencias de los diez casos.</li>
+      </ol>
+    </section>
+    <section class="panel">
+      <h2>Cómo medimos el avance</h2>
+      <p>
+        Cada componente vale 2 puntos: el alcance total es de 20. Marcar un caso como listo ayuda a
+        preparar la exposición; no asigna una calificación automática.
+      </p>
+      <p>
+        Las publicaciones, la creación del repositorio remoto y las capturas se completan con tus
+        cuentas y los resultados reales de cada ejercicio.
+      </p>
+      <p class="small-note">Instructor: Aristedes Novoa Arbildo · Curso CURS-000662.</p>
+    </section>
+  </div>
+}

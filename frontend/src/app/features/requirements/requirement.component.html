@@ -1,0 +1,240 @@
+@if (store.data(); as data) {
+  @if (selected(); as r) {
+    <button class="back" (click)="back.emit()">
+      <app-icon name="chevronLeft" [size]="16" />
+      Todos los casos
+    </button>
+    <section class="case-heading">
+      <div>
+        <p class="eyebrow">COMPONENTE {{ r.id.toString().padStart(2, '0') }} / 10 · 2 PUNTOS</p>
+        <h1>{{ r.title }}</h1>
+        <p class="intro">{{ r.summary }}</p>
+      </div>
+      <app-status-badge [status]="r.progress.status" />
+    </section>
+    <div class="case-layout">
+      <div class="case-main">
+        <section class="panel">
+          <div class="panel-label">
+            01
+            <span>LO QUE PIDE LA RÚBRICA</span>
+          </div>
+          <p class="requirement-text">{{ r.requirement }}</p>
+          <ul class="checklist">
+            @for (item of r.checklist; track item) {
+              <li>
+                <span><app-icon name="check" [size]="17" /></span>
+                {{ item }}
+              </li>
+            }
+          </ul>
+        </section>
+        <section class="panel">
+          <div class="panel-label">
+            02
+            <span>COMANDOS Y EJECUCIÓN</span>
+          </div>
+          <p class="muted">PowerShell · Ejecuta por bloques y registra los resultados.</p>
+          @for (cmd of r.commands; track cmd.label) {
+            <div class="code-block">
+              <div class="code-heading">
+                <span>{{ cmd.label }}</span>
+                <button (click)="notifications.copy(cmd.code)">Copiar</button>
+              </div>
+              <pre><code>{{cmd.code}}</code></pre>
+            </div>
+          }
+          <div class="callout">{{ r.note }}</div>
+        </section>
+        <section class="panel" id="evidencias">
+          <div class="panel-label">
+            03
+            <span>EVIDENCIAS DEL CASO</span>
+            <span class="count-tag">{{ r.evidence.length }}</span>
+          </div>
+          <p class="muted">
+            Cada captura queda vinculada a este componente y guardada en un volumen.
+          </p>
+          <div class="evidence-guide">
+            <strong>Qué debemos capturar</strong>
+            <ul>
+              @for (item of r.evidenceGuide; track item) {
+                <li>{{ item }}</li>
+              }
+            </ul>
+          </div>
+          <form class="upload-form" (ngSubmit)="upload()">
+            <label class="upload-zone">
+              <span class="upload-icon"><app-icon name="upload" [size]="24" /></span>
+              <strong>{{ file ? file.name : 'Selecciona una captura de pantalla' }}</strong>
+              <span>PNG, JPG o WebP · hasta 8 MB</span>
+              <input
+                #fileInput
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                (change)="pickFile($event)"
+                [disabled]="busy()"
+              />
+            </label>
+            <label>
+              Título de la evidencia
+              <input
+                name="title"
+                [(ngModel)]="title"
+                maxlength="160"
+                placeholder="Ej. Cinco contenedores en estado healthy"
+                required
+              />
+            </label>
+            <div class="rich-editor-field">
+              <label>
+                Descripción
+                <span class="optional">opcional</span>
+              </label>
+              @defer (on viewport) {
+                <app-rich-text-editor [(value)]="description" [disabled]="busy()" />
+              } @placeholder {
+                <div class="editor-loading-placeholder">Preparando el editor de descripción…</div>
+              } @loading {
+                <div class="editor-loading-placeholder" role="status">Cargando editor…</div>
+              } @error {
+                <div class="evidence-form-error" role="alert">
+                  No se pudo cargar el editor. Recarga la página para volver a intentarlo.
+                </div>
+              }
+            </div>
+            <button class="primary" type="submit" [disabled]="busy() || !file || !title.trim()">
+              <app-icon name="upload" [size]="17" />
+              {{ busy() ? 'Guardando…' : 'Guardar evidencia' }}
+            </button>
+          </form>
+          <div class="gallery">
+            @for (item of r.evidence; track item.id) {
+              <article class="evidence-card">
+                <button
+                  class="image-button"
+                  (click)="openEvidence(item)"
+                  [attr.aria-label]="'Ver detalle: ' + item.title"
+                >
+                  <img [src]="item.url" [alt]="item.title" loading="lazy" />
+                </button>
+                <div class="evidence-caption">
+                  <h4>{{ item.title }}</h4>
+                  @if (item.description) {
+                    <app-rich-text
+                      [value]="item.description"
+                      [format]="item.descriptionFormat ?? 'markdown'"
+                      [compact]="true"
+                    />
+                  } @else {
+                    <p class="description-empty">Sin descripción.</p>
+                  }
+                  <div class="evidence-card-meta">
+                    <small>{{ item.uploadedAt | date: 'dd/MM/yyyy HH:mm' }}</small>
+                    <button
+                      class="delete-button"
+                      (click)="removeEvidence(item)"
+                      [disabled]="busy()"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                  <div class="evidence-card-actions">
+                    <button type="button" class="text-button" (click)="openEvidence(item)">
+                      <app-icon name="eye" [size]="16" />
+                      Ver detalle
+                    </button>
+                    <button
+                      type="button"
+                      class="outline evidence-edit-button"
+                      (click)="editEvidence(item)"
+                      [disabled]="busy()"
+                    >
+                      <app-icon name="edit" [size]="15" />
+                      Editar
+                    </button>
+                  </div>
+                </div>
+              </article>
+            } @empty {
+              <div class="empty-evidence">
+                <span><app-icon name="image" [size]="28" /></span>
+                <strong>Aún no hay capturas en este caso</strong>
+                <p>Las subiremos a medida que avancemos en el examen.</p>
+              </div>
+            }
+          </div>
+        </section>
+      </div>
+      <aside class="case-aside">
+        <section class="panel sticky-panel">
+          <div class="panel-label">TU AVANCE</div>
+          <form (ngSubmit)="saveProgress()">
+            <label>
+              Estado del caso
+              <select name="status" [(ngModel)]="status">
+                <option value="pendiente">Pendiente</option>
+                <option value="en-progreso">En progreso</option>
+                <option value="listo">Listo para revisar</option>
+              </select>
+            </label>
+            <label>
+              Notas de la implementación
+              <textarea
+                name="notes"
+                [(ngModel)]="notes"
+                maxlength="4000"
+                rows="7"
+                placeholder="Anota resultados, enlaces de los registros y detalles para la sustentación."
+              ></textarea>
+            </label>
+            <button class="primary full-width" [disabled]="busy()">
+              {{ busy() ? 'Guardando…' : 'Guardar avance' }}
+            </button>
+          </form>
+          <p class="small-note">
+            Este estado es una autoevaluación. La revisión final corresponde al instructor.
+          </p>
+          <div class="aside-divider"></div>
+          <span class="overline">SIGUIENTE COMPONENTE</span>
+          <button
+            class="next-case"
+            (click)="r.id < 10 ? selectRequirement.emit(r.id + 1) : back.emit()"
+          >
+            {{ r.id < 10 ? data.requirements[r.id].title : 'Volver al resumen' }}
+            <app-icon name="arrowRight" [size]="17" />
+          </button>
+        </section>
+      </aside>
+    </div>
+  }
+  @if (lightbox(); as image) {
+    <app-image-dialog
+      [evidence]="image"
+      (closed)="lightbox.set(null)"
+      (editRequested)="editEvidence($event)"
+    />
+  }
+  @defer (when editingEvidence()) {
+    @if (editingEvidence(); as evidence) {
+      <app-evidence-edit-dialog
+        [evidence]="evidence"
+        (closed)="editingEvidence.set(null)"
+        (saved)="evidenceSaved($event)"
+      />
+    }
+  } @loading {
+    <div class="modal-backdrop">
+      <div class="editor-loading-placeholder" role="status">Cargando formulario de edición…</div>
+    </div>
+  } @error {
+    @if (editingEvidence()) {
+      <div class="modal-backdrop">
+        <div class="panel">
+          <p>No se pudo cargar la edición. Recarga la página y vuelve a intentarlo.</p>
+          <button class="outline" (click)="editingEvidence.set(null)">Cerrar</button>
+        </div>
+      </div>
+    }
+  }
+}

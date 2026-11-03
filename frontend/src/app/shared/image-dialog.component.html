@@ -1,0 +1,92 @@
+<div class="modal-backdrop" (click)="closed.emit()">
+  <section
+    class="evidence-detail-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="evidence-detail-title"
+    appDialogFocus
+    (click)="$event.stopPropagation()"
+  >
+    <header class="evidence-dialog-header">
+      <div>
+        <p class="eyebrow">DETALLE DE LA EVIDENCIA</p>
+        <h2 id="evidence-detail-title">{{ evidence().title }}</h2>
+        <p class="evidence-detail-meta">
+          Registrada el {{ evidence().uploadedAt | date: 'dd/MM/yyyy HH:mm' }} ·
+          {{ evidence().size / 1024 | number: '1.0-1' }} KB
+        </p>
+      </div>
+      <button class="icon-button" (click)="closed.emit()" aria-label="Cerrar detalle">
+        <app-icon name="close" />
+      </button>
+    </header>
+    <div class="evidence-detail-body">
+      <section class="detail-image-panel" aria-label="Captura de la evidencia">
+        <div class="detail-image-toolbar">
+          <span>
+            <app-icon name="image" [size]="17" />
+            Captura original
+          </span>
+          <div>
+            <button
+              class="icon-button"
+              (click)="changeZoom(-0.25)"
+              [disabled]="zoom() <= 1"
+              aria-label="Reducir imagen"
+            >
+              <app-icon name="zoomOut" [size]="17" />
+            </button>
+            <button class="zoom-reset" (click)="zoom.set(1)" title="Ajustar imagen">
+              {{ zoom() * 100 | number: '1.0-0' }}%
+            </button>
+            <button
+              class="icon-button"
+              (click)="changeZoom(0.25)"
+              [disabled]="zoom() >= 3"
+              aria-label="Ampliar imagen"
+            >
+              <app-icon name="zoomIn" [size]="17" />
+            </button>
+          </div>
+        </div>
+        <div
+          class="detail-image-viewport"
+          tabindex="0"
+          aria-label="Imagen ampliable; usa los controles de zoom"
+        >
+          <div
+            class="detail-image-stage"
+            [style.width.%]="zoom() * 100"
+            [style.height.%]="zoom() * 100"
+          >
+            <img [src]="evidence().url" [alt]="evidence().title" />
+          </div>
+        </div>
+        <a class="detail-original-link" [href]="evidence().url" target="_blank" rel="noopener">
+          Abrir imagen en otra pestaña
+          <app-icon name="arrowUpRight" [size]="15" />
+        </a>
+      </section>
+      <section class="detail-description-panel" aria-label="Descripción completa">
+        <span class="overline">DESCRIPCIÓN Y RESULTADOS</span>
+        @if (evidence().description) {
+          <app-rich-text
+            [value]="evidence().description"
+            [format]="evidence().descriptionFormat ?? 'markdown'"
+          />
+        } @else {
+          <p class="description-empty">
+            Esta evidencia aún no tiene descripción. Puedes agregarla con «Editar evidencia».
+          </p>
+        }
+      </section>
+    </div>
+    <footer class="evidence-dialog-footer">
+      <button class="outline" (click)="closed.emit()">Cerrar</button>
+      <button class="primary" (click)="editRequested.emit(evidence())">
+        <app-icon name="edit" [size]="17" />
+        Editar evidencia
+      </button>
+    </footer>
+  </section>
+</div>

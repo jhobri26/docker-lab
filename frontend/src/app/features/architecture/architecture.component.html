@@ -1,0 +1,148 @@
+@if (store.data(); as data) {
+  <section class="page-heading">
+    <div>
+      <p class="eyebrow">INFRAESTRUCTURA DEL PROYECTO</p>
+      <h1>Arquitectura y servicios</h1>
+      <p class="intro">Cinco contenedores, cuatro imágenes y una red compartida.</p>
+    </div>
+    <button class="outline" (click)="store.checkServices()">
+      <app-icon name="refresh" [size]="17" />
+      Comprobar servicios
+    </button>
+  </section>
+  <div class="architecture-flow">
+    <div class="arch-box">
+      <span class="tech-letter angular">A</span>
+      <strong>Angular + Nginx</strong>
+      <small>frontend · frontend-demo</small>
+      <span>:18080 / :18081 / :18082</span>
+    </div>
+    <span class="flow-arrow"><app-icon name="arrowRight" [size]="24" /></span>
+    <div class="arch-box">
+      <span class="tech-letter dotnet">.N</span>
+      <strong>API .NET 10</strong>
+      <small>api · puerto interno 8080</small>
+      <span>REST + carga de imágenes</span>
+    </div>
+    <span class="flow-arrow"><app-icon name="arrowRight" [size]="24" /></span>
+    <div class="arch-databases">
+      <div class="arch-box">
+        <span class="tech-letter sql">SQL</span>
+        <strong>SQL Server 2022</strong>
+        <small>Estado, notas y metadatos</small>
+      </div>
+      <div class="redis-box">
+        <span class="status-dot" [class.online]="store.services()?.redis"></span>
+        <strong>Redis</strong>
+        <span>Contador de consultas</span>
+      </div>
+    </div>
+  </div>
+  <div class="service-grid">
+    <div class="panel">
+      <span class="overline">API .NET</span>
+      <h3>
+        <span class="status-dot" [class.online]="store.services()?.api"></span>
+        {{ store.services()?.api ? 'Disponible' : 'Sin respuesta' }}
+      </h3>
+      <p>Versión {{ store.services()?.version ?? '—' }}</p>
+    </div>
+    <div class="panel">
+      <span class="overline">SQL SERVER</span>
+      <h3>
+        <span class="status-dot" [class.online]="store.services()?.database"></span>
+        {{ store.services()?.database ? 'Conectado' : 'Sin respuesta' }}
+      </h3>
+      <p>Datos persistidos en SQL</p>
+    </div>
+    <div class="panel">
+      <span class="overline">REDIS</span>
+      <h3>
+        <span class="status-dot" [class.online]="store.services()?.redis"></span>
+        {{ store.services()?.redis ? 'Disponible' : 'Sin respuesta' }}
+      </h3>
+      <p>{{ store.services()?.visits ?? '—' }} consultas al panel</p>
+    </div>
+  </div>
+  <section class="panel">
+    <div class="section-heading compact">
+      <h2>Mapa de contenedores</h2>
+      <span class="count-tag">Red: dockerexam-net</span>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Servicio</th>
+            <th>Imagen</th>
+            <th>Acceso / función</th>
+            <th>Persistencia</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>frontend</td>
+            <td>dockerexam-frontend:local</td>
+            <td>
+              <a href="http://localhost:18080" target="_blank" rel="noopener">:18080 ↗</a>
+              /
+              <a href="http://localhost:18081" target="_blank" rel="noopener">:18081 ↗</a>
+            </td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td>frontend-demo</td>
+            <td>dockerexam-frontend:local</td>
+            <td>
+              <a href="http://localhost:18082" target="_blank" rel="noopener">:18082 ↗</a>
+            </td>
+            <td>Comparte API y datos</td>
+          </tr>
+          <tr>
+            <td>api</td>
+            <td>dockerexam-api:local</td>
+            <td>REST · acceso por Nginx</td>
+            <td>evidence-data</td>
+          </tr>
+          <tr>
+            <td>sqlserver</td>
+            <td>mcr.microsoft.com/mssql/server:2022-latest</td>
+            <td>1433 interno</td>
+            <td>sql-data</td>
+          </tr>
+          <tr>
+            <td>redis</td>
+            <td>redis:7.4-alpine</td>
+            <td>6379 interno</td>
+            <td>redis-data</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+  <div class="two-columns">
+    <section class="panel">
+      <div class="panel-label">DATOS QUE PERMANECEN</div>
+      <p>
+        SQL Server guarda el alumno, los estados, las notas y los metadatos de las evidencias. Un
+        volumen independiente guarda las imágenes originales. Redis conserva su contador con AOF.
+      </p>
+      <button class="text-button" (click)="selectRequirement.emit(9)">
+        Demostrar persistencia
+        <app-icon name="arrowRight" [size]="16" />
+      </button>
+    </section>
+    <section class="panel">
+      <div class="panel-label">SECRETS Y CONECTIVIDAD</div>
+      <p>
+        SQL Server y la API leen la contraseña desde un secret por archivo. El stack usa nombres
+        DNS; el caso 03 incluye un laboratorio independiente que conecta tres contenedores por IP
+        interna.
+      </p>
+      <button class="text-button" (click)="selectRequirement.emit(3)">
+        Ver laboratorio por IP
+        <app-icon name="arrowRight" [size]="16" />
+      </button>
+    </section>
+  </div>
+}

@@ -1,0 +1,22 @@
+<section class="report-card" [class.ready]="store.reportReady()" aria-labelledby="report-title">
+  <div class="report-icon"><app-icon name="file" [size]="25" /></div>
+  <div class="report-copy">
+    <p class="eyebrow">INFORME DEL PROYECTO · {{ store.ready() }}/{{ store.totalCases() }} CASOS LISTOS</p>
+    <h2 id="report-title">Tu proyecto en un PDF</h2>
+    <p>Reúne tus diez casos, las notas de desarrollo y todas las evidencias con sus descripciones.</p>
+    <p class="report-status">
+      @if (store.reportReady()) {
+        El proyecto está al 100 %. Ya puedes generar tu informe para la revisión.
+      } @else {
+        Puedes descargar el avance actual. El PDF muestra el estado real de cada caso y todo lo guardado.
+      }
+    </p>
+    @if (report.error()) { <p class="report-error" role="alert">{{ report.error() }}</p> }
+    @if (report.message()) { <p class="report-success" role="status">{{ report.message() }}</p> }
+  </div>
+  <button class="primary" [disabled]="!store.data() || report.generating()"
+    [attr.aria-busy]="report.generating()" (click)="report.generate()">
+    <app-icon name="download" [size]="17" />
+    {{ report.generating() ? 'Generando PDF…' : 'Descargar PDF' }}
+  </button>
+</section>

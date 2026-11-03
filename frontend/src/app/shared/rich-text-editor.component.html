@@ -1,0 +1,142 @@
+<div
+  class="rich-editor"
+  [class.rich-editor--empty]="empty()"
+  [class.rich-editor--disabled]="disabled()"
+>
+  <div
+    class="rich-editor-toolbar"
+    role="toolbar"
+    aria-label="Formato de la descripción"
+    (mousedown)="$event.preventDefault()"
+  >
+    <button
+      type="button"
+      title="Negrita (Ctrl+B)"
+      aria-label="Negrita"
+      [attr.aria-pressed]="active('bold')"
+      [class.active]="active('bold')"
+      [disabled]="disabled()"
+      (click)="run('bold')"
+    >
+      <strong>B</strong>
+    </button>
+    <button
+      type="button"
+      title="Cursiva (Ctrl+I)"
+      aria-label="Cursiva"
+      [attr.aria-pressed]="active('italic')"
+      [class.active]="active('italic')"
+      [disabled]="disabled()"
+      (click)="run('italic')"
+    >
+      <em>I</em>
+    </button>
+    <button
+      type="button"
+      title="Subrayado (Ctrl+U)"
+      aria-label="Subrayado"
+      [attr.aria-pressed]="active('underline')"
+      [class.active]="active('underline')"
+      [disabled]="disabled()"
+      (click)="run('underline')"
+    >
+      <u>U</u>
+    </button>
+    <button
+      type="button"
+      class="highlight-tool"
+      title="Resaltar texto (Ctrl+Shift+H)"
+      [attr.aria-pressed]="active('highlight')"
+      [class.active]="active('highlight')"
+      [disabled]="disabled()"
+      (click)="run('highlight')"
+    >
+      <span>ab</span>
+      Resaltar
+    </button>
+    <span class="toolbar-divider"></span>
+    <button
+      type="button"
+      title="Subtítulo"
+      aria-label="Subtítulo"
+      [class.active]="active('heading')"
+      [disabled]="disabled()"
+      (click)="run('heading')"
+    >
+      H2
+    </button>
+    <button
+      type="button"
+      title="Lista con viñetas"
+      aria-label="Lista con viñetas"
+      [class.active]="active('bulletList')"
+      [disabled]="disabled()"
+      (click)="run('bulletList')"
+    >
+      <app-icon name="list" [size]="18" />
+    </button>
+    <button
+      type="button"
+      title="Lista numerada"
+      aria-label="Lista numerada"
+      [class.active]="active('orderedList')"
+      [disabled]="disabled()"
+      (click)="run('orderedList')"
+    >
+      <app-icon name="listOrdered" [size]="18" />
+    </button>
+    <button
+      type="button"
+      title="Bloque de código"
+      aria-label="Bloque de código"
+      [class.active]="active('codeBlock')"
+      [disabled]="disabled()"
+      (click)="run('codeBlock')"
+    >
+      <app-icon name="terminal" [size]="17" />
+    </button>
+    <button
+      type="button"
+      title="Cita"
+      aria-label="Cita"
+      [class.active]="active('blockquote')"
+      [disabled]="disabled()"
+      (click)="run('blockquote')"
+    >
+      <app-icon name="quote" [size]="17" />
+    </button>
+    <span class="toolbar-divider"></span>
+    <button
+      type="button"
+      title="Deshacer (Ctrl+Z)"
+      aria-label="Deshacer"
+      [disabled]="disabled()"
+      (click)="run('undo')"
+    >
+      <app-icon name="undo" [size]="17" />
+    </button>
+    <button
+      type="button"
+      title="Rehacer (Ctrl+Shift+Z)"
+      aria-label="Rehacer"
+      [disabled]="disabled()"
+      (click)="run('redo')"
+    >
+      <app-icon name="redo" [size]="17" />
+    </button>
+    <button
+      type="button"
+      title="Quitar formato"
+      aria-label="Quitar formato"
+      [disabled]="disabled()"
+      (click)="run('clear')"
+    >
+      <app-icon name="clearFormat" [size]="17" />
+    </button>
+  </div>
+  <div #editorHost class="rich-editor-surface"></div>
+  <div class="rich-editor-footer">
+    <span>Selecciona texto para aplicar formato o resaltado.</span>
+    <span>{{ characters() }} caracteres</span>
+  </div>
+</div>

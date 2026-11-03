@@ -1,0 +1,224 @@
+@if (store.data(); as data) {
+  <section class="overview-hero">
+    <div class="hero-main">
+      <p class="eyebrow">
+        <span></span>
+        DOCKER & DOCKER COMPOSE FOR DEVELOPERS
+      </p>
+      <h1>Panel del examen final</h1>
+      <p class="hero-description">
+        Tu implementación, paso a paso. Organiza los casos y reúne las evidencias para tu
+        sustentación.
+      </p>
+      <div class="hero-actions">
+        @if (store.nextRequirement(); as next) {
+          <button class="primary" (click)="selectRequirement.emit(next.id)">
+            <app-icon name="play" [size]="16" />
+            {{ store.ready() || store.inProgress() ? 'Continuar recorrido' : 'Comenzar recorrido' }}
+            <app-icon name="arrowRight" [size]="17" />
+          </button>
+        }
+        <a class="outline" href="/api/resources/rubric" target="_blank" rel="noopener">
+          <app-icon name="download" [size]="17" />
+          Ver rúbrica
+        </a>
+      </div>
+    </div>
+    <div class="hero-progress">
+      <div
+        class="progress-ring"
+        role="progressbar"
+        aria-label="Casos listos para revisar"
+        [attr.aria-valuenow]="store.completion()"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        [style.background]="'conic-gradient(var(--primary) ' + store.completion() + '%, #e4eaf5 0)'"
+      >
+        <div>
+          <strong>
+            {{ store.completion() }}
+            <small>%</small>
+          </strong>
+          <span>completado</span>
+        </div>
+      </div>
+      <div class="hero-progress-copy">
+        <span class="hero-progress-label">AVANCE DECLARADO</span>
+        <strong>{{ store.ready() }} de {{ store.totalCases() }} casos</strong>
+        <p>listos para revisión</p>
+        <span class="progress-status">
+          <i></i>
+          {{ store.ready() === store.totalCases() ? 'Recorrido completo' : 'En preparación' }}
+        </span>
+      </div>
+    </div>
+    <div class="hero-student">
+      <span class="mini-avatar">{{ store.studentInitials() }}</span>
+      <div>
+        <span class="overline">PRESENTADO POR</span>
+        <strong>{{ data.profile.student }}</strong>
+      </div>
+      <span class="student-course">CURS-000662</span>
+      <button class="text-button" (click)="editProfile.emit()">
+        Editar datos
+        <app-icon name="arrowUpRight" [size]="14" />
+      </button>
+    </div>
+  </section>
+
+  <app-final-report />
+
+  <section class="stats" aria-label="Resumen del proyecto">
+    <article class="stat">
+      <div class="stat-top">
+        <span>Componentes del examen</span>
+        <span class="stat-icon blue"><app-icon name="layers" [size]="20" /></span>
+      </div>
+      <strong>
+        {{ store.totalCases() }}
+        <small>casos</small>
+      </strong>
+      <div class="stat-footer">
+        <span class="stat-marker blue"></span>
+        La rúbrica completa
+      </div>
+    </article>
+    <article class="stat">
+      <div class="stat-top">
+        <span>Listos para revisar</span>
+        <span class="stat-icon green"><app-icon name="checkCircle" [size]="20" /></span>
+      </div>
+      <strong>
+        {{ store.ready() }}
+        <small>de {{ store.totalCases() }}</small>
+      </strong>
+      <div class="stat-footer">
+        <span class="stat-marker green"></span>
+        {{ store.inProgress() }}
+        {{ store.inProgress() === 1 ? 'caso en progreso' : 'casos en progreso' }}
+      </div>
+    </article>
+    <article class="stat">
+      <div class="stat-top">
+        <span>Evidencias del proyecto</span>
+        <span class="stat-icon purple"><app-icon name="image" [size]="20" /></span>
+      </div>
+      <strong>
+        {{ store.totalEvidence() }}
+        <small>capturas</small>
+      </strong>
+      <div class="stat-footer">
+        <span class="stat-marker purple"></span>
+        Almacenamiento persistente
+      </div>
+    </article>
+    <article class="stat">
+      <div class="stat-top">
+        <span>Alcance de la evaluación</span>
+        <span class="stat-icon amber"><app-icon name="trophy" [size]="20" /></span>
+      </div>
+      <strong>
+        {{ store.totalCases() * 2 }}
+        <small>puntos</small>
+      </strong>
+      <div class="stat-footer">
+        <span class="stat-marker amber"></span>
+        2 puntos por componente
+      </div>
+    </article>
+  </section>
+
+  <section class="cases-section" aria-labelledby="cases-title">
+    <div class="section-heading">
+      <div>
+        <p class="section-eyebrow">TU RECORRIDO</p>
+        <h2 id="cases-title">
+          Componentes del examen
+          <span class="heading-count">{{ store.totalCases() }}</span>
+        </h2>
+        <p>Ejecuta cada caso y documenta el resultado con tus capturas.</p>
+      </div>
+      <span class="review-note">
+        <app-icon name="info" [size]="16" />
+        El estado es una autoevaluación.
+      </span>
+    </div>
+    <div class="filters">
+      <div class="filter-pills" role="group" aria-label="Filtrar por estado">
+        @for (f of filters; track f.id) {
+          <button
+            [class.selected]="filter() === f.id"
+            [attr.aria-pressed]="filter() === f.id"
+            (click)="filter.set(f.id)"
+          >
+            {{ f.name }}
+            <span>{{ filterCount(f.id) }}</span>
+          </button>
+        }
+      </div>
+      <div class="search-field">
+        <app-icon name="search" [size]="18" />
+        <input
+          type="search"
+          aria-label="Buscar un caso"
+          placeholder="Buscar componente…"
+          [ngModel]="search()"
+          (ngModelChange)="search.set($event)"
+        />
+      </div>
+    </div>
+    <div class="case-grid">
+      @for (r of filtered(); track r.id) {
+        <button
+          class="case-card"
+          [attr.data-category]="r.id"
+          (click)="selectRequirement.emit(r.id)"
+        >
+          <div class="card-top">
+            <span class="case-icon">
+              <app-icon [name]="caseIcons[r.id] || 'box'" [size]="23" />
+            </span>
+            <app-status-badge [status]="r.progress.status" />
+          </div>
+          <div class="card-kicker">
+            <span>CASO {{ r.id.toString().padStart(2, '0') }}</span>
+            <span>2 PUNTOS</span>
+          </div>
+          <h3>{{ r.title }}</h3>
+          <p>{{ r.summary }}</p>
+          <div class="card-bottom">
+            <span class="evidence-count">
+              <app-icon name="image" [size]="16" />
+              {{ r.evidence.length }} {{ r.evidence.length === 1 ? 'evidencia' : 'evidencias' }}
+            </span>
+            <span class="card-action">
+              Ver caso
+              <app-icon name="arrowRight" [size]="17" />
+            </span>
+          </div>
+        </button>
+      } @empty {
+        <div class="empty">
+          <span class="empty-search-icon"><app-icon name="search" [size]="28" /></span>
+          <strong>No encontramos componentes</strong>
+          <p>Prueba otro término o cambia el filtro de estado.</p>
+          <button class="outline" (click)="search.set(''); filter.set('todos')">
+            Mostrar todos
+          </button>
+        </div>
+      }
+    </div>
+  </section>
+
+  <div class="bottom-note">
+    <span class="bottom-note-icon"><app-icon name="shield" [size]="24" /></span>
+    <div>
+      <strong>Tu evidencia forma parte del proyecto.</strong>
+      <p>Las notas y capturas se conservan al recrear los contenedores con sus volúmenes.</p>
+    </div>
+    <button class="text-button" (click)="selectRequirement.emit(9)">
+      Ver persistencia
+      <app-icon name="arrowRight" [size]="17" />
+    </button>
+  </div>
+}

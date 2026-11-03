@@ -1,0 +1,70 @@
+<div class="modal-backdrop">
+  <section
+    class="evidence-edit-dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="edit-evidence-title"
+    appDialogFocus
+  >
+    <header class="evidence-dialog-header">
+      <div>
+        <p class="eyebrow">DOCUMENTACIÓN DEL EXAMEN</p>
+        <h2 id="edit-evidence-title">Editar evidencia</h2>
+      </div>
+      <button
+        class="icon-button"
+        type="button"
+        (click)="close()"
+        [disabled]="busy()"
+        aria-label="Cerrar edición"
+      >
+        <app-icon name="close" />
+      </button>
+    </header>
+    <form (ngSubmit)="save()">
+      <div class="evidence-edit-body">
+        <div class="evidence-edit-identity">
+          <img [src]="evidence().url" [alt]="evidence().title" />
+          <label>
+            Título de la evidencia
+            <input
+              name="editTitle"
+              [(ngModel)]="title"
+              maxlength="160"
+              required
+              data-autofocus
+              [disabled]="busy()"
+            />
+            <small>La captura original se conserva.</small>
+          </label>
+        </div>
+        <div class="rich-editor-field">
+          <label id="edit-description-label">
+            Descripción
+            <span class="optional">opcional</span>
+          </label>
+          <app-rich-text-editor
+            [(value)]="description"
+            [disabled]="busy()"
+            label="Editar descripción de la evidencia"
+          />
+        </div>
+        @if (error()) {
+          <div class="evidence-form-error" role="alert">
+            <app-icon name="info" [size]="18" />
+            {{ error() }}
+          </div>
+        }
+      </div>
+      <footer class="evidence-dialog-footer">
+        <button class="outline" type="button" (click)="close()" [disabled]="busy()">
+          Cancelar
+        </button>
+        <button class="primary" type="submit" [disabled]="busy() || !title.trim()">
+          <app-icon name="check" [size]="17" />
+          {{ busy() ? 'Guardando…' : 'Guardar cambios' }}
+        </button>
+      </footer>
+    </form>
+  </section>
+</div>

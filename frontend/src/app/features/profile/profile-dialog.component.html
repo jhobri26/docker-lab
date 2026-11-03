@@ -1,0 +1,31 @@
+<div class="modal-backdrop" (click)="close()">
+  <section
+    class="profile-modal panel"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Datos de presentación"
+    (click)="$event.stopPropagation()"
+  >
+    <button class="modal-close" (click)="close()" aria-label="Cerrar">×</button>
+    <p class="eyebrow">PRESENTACIÓN DEL EXAMEN</p>
+    <h2>Datos del proyecto</h2>
+    <form (ngSubmit)="save()">
+      <label>
+        Nombre del alumno
+        <input name="student" [(ngModel)]="student" maxlength="160" required />
+      </label>
+      <label>
+        Repositorio remoto
+        <span class="optional">opcional</span>
+        <input
+          name="repo"
+          type="url"
+          [(ngModel)]="repositoryUrl"
+          maxlength="500"
+          placeholder="https://github.com/usuario/proyecto"
+        />
+      </label>
+      <button class="primary" [disabled]="busy()">Guardar datos</button>
+    </form>
+  </section>
+</div>

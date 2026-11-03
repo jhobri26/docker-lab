@@ -1,0 +1,28 @@
+:root {
+  font-family:
+    'Segoe UI',
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    Arial,
+    sans-serif;
+  color: #23324a;
+  background: #f4f6fa;
+  font-synthesis: none;
+  color-scheme: light;
+  --primary: #3563e9;
+  --primary-hover: #254fce;
+  --primary-soft: #edf2ff;
+  --ink: #172640;
+  --text: #35445c;
+  --muted: #728097;
+  --line: #e4e9f1;
+  --surface: #fff;
+  --background: #f4f6fa;
+  --success: #168369;
+  --sidebar: #111c31;
+  --side: 264px;
+  --radius: 14px;
+  --shadow-sm: 0 2px 5px #1d355209;
+  --shadow: 0 12px 32px #1d35520a;
+}

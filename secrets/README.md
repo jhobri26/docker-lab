@@ -1,0 +1,9 @@
+Crea `db_password.txt` manualmente con el editor solo si todavía no existe. Escribe una contraseña propia de al menos 16 caracteres ASCII, con mayúsculas, minúsculas, números y símbolos, en una sola línea, sin espacios ni comillas. Guarda en UTF-8 sin BOM. Si SQL ya fue inicializado, conserva su contraseña: editar el archivo no cambia la contraseña de la base existente.
+
+Docker Compose monta el archivo como secret en SQL Server y la API. En Compose local es un archivo montado, no un secret cifrado de Docker Swarm. No subas su contenido a Git ni lo muestres en capturas.
+
+Para el laboratorio independiente del caso 03, la guía indica crear a mano `three-sql.txt` con la variable `MSSQL_SA_PASSWORD` y el mismo valor. Es un archivo de variables para ese contenedor SQL. Todos los `secrets/*.txt` se excluyen mediante `.gitignore`.
+
+Para el caso 09 crea manualmente **`caso9_db_password.txt`**, utilizado por `compose.caso9.yml`. Contiene solo una contraseña propia, con los mismos requisitos de formato indicados arriba; no incluyas `MSSQL_SA_PASSWORD=`. Es un archivo de texto, no una carpeta. Este caso tiene base y volúmenes independientes. Si su SQL ya se inicializó, conserva el archivo y su contraseña durante la eliminación/recreación de contenedores. El archivo no se genera ni se rellena automáticamente. Consulta los doce pasos del caso 09 en `backend/Content/guide.md`.
+
+La longitud por sí sola no valida la contraseña: incluye al menos una mayúscula, una minúscula, un número y un símbolo. Si SQL ya se inicializó, cambiar el archivo no modifica la contraseña `sa` almacenada en el volumen. Un error 18456 con estado 8 significa que las contraseñas no coinciden. La guía distingue cómo restaurar la contraseña válida conservando datos y cómo reiniciar únicamente un laboratorio vacío; no elimines volúmenes de una prueba de persistencia en curso.

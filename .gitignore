@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.angular/
+bin/
+obj/
+tmp/
+.env
+secrets/*.txt
+!secrets/README.md
+*.user
+artifacts/
+__pycache__/
